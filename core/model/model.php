@@ -116,15 +116,15 @@ class Model extends Singleton
 
 $model = Model::getInstance();
 
-$user = $model->user(2);
-
-print_r($user);
-
-$user->name = 'test';
-$user->password = 'password2';
+// $user = $model->user;
+$user = $model->user(5);
 
 
-print_r($user);
+// $user->name = 'test';
+$user->password = 'password3';
+
+
+// print_r($user);
 
 
 // $model->user(2);					// return Entity object

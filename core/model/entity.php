@@ -43,10 +43,16 @@ class Entity
         // сделать в одном, создать или обновить при существовании
 
         if (empty($this->entity_id)) {
-            echo 'create';
-
-            
-            $query = "INSERT INTO `users` (`user`, `name`, `password`, `job`) VALUES (NULL, 'judy', 'manager', '3');";
+            $columns = [];
+            $values = [];
+            foreach ($this->changed as $k => $v) {
+                $columns[] = "`{$k}`";
+                $values[] = "'{$v}'";
+            }
+            $columns = implode(', ', $columns);
+            $values = implode(', ', $values);
+            $query = "INSERT INTO `users` ({$columns}) VALUES ({$values});";
+            $this->db->query($query);
 
         } else if (!empty($this->changed)) {
             $updates = [];
