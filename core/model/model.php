@@ -1,5 +1,20 @@
 <?php
 
+/**
+ * $model->user(2);	- return Entity object
+ * $model->user(['name' => 'user1']); - return Entity object
+ * 
+ * $model->user - return empty Entity for create new table row
+ * 
+ * 
+ * $model->query($query) - return Query object with query
+ * 
+ * $model->users; - return Query object with table 'users'
+ * $model->users([...]) - return Query object with `table` 'users' and `where` params
+ * 
+ */
+
+
 class Model extends Singleton
 {
     private $db;
@@ -24,7 +39,7 @@ class Model extends Singleton
 	{
 		$tables = Cache::get('tables');
 		$entities = Cache::get('entities');
-		if (!empty($tables) || !empty($entities)) {
+		if (!empty($tables) && !empty($entities)) {
 			$this->tables = $tables;
 			$this->entities = $entities;
 
@@ -107,8 +122,7 @@ class Model extends Singleton
 	}
 
 
-	// create table with array ??
-	// create new object with array or entity
+	// создание новой записи в таблице с использованием либо существующей entity либо через data array
 	// public function __set() {}
 
 }
@@ -121,24 +135,9 @@ $user = $model->user(5);
 
 
 // $user->name = 'test';
-$user->password = 'password3';
+$user->password = 'pas0ds00ord33';
 
 
-// print_r($user);
+debug($user);
 
 
-// $model->user(2);					// return Entity object
-// $model->user(['name' => 'user1']);  // return Entity object
-// $model->user    					// return empty Entity for create new table row
-
-// $model->users;						// return Query object with table
-// $model->users([...])				// return Query with Where
-
-
-
-
-// $query = $model->query("SELECT * FROM users");
-// print_r($query->fetch());
-// print_r($query->fetch());
-
-// print_r($model->table('users')->where(['user' => 1])->fetch());

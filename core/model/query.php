@@ -1,5 +1,15 @@
 <?php
 
+/**
+ * $query = $model->query($query)
+ * 
+ * $query->fetch()
+ * $query->fetchAll()
+ * $query->entity()
+ * $query->entityAll()
+ * 
+ */
+
 class Query
 {
     private $db;
@@ -10,10 +20,10 @@ class Query
     public function __construct(&$db, $table, $query = null)
     {
         $this->db = $db;
-        $this->table = $table;
         if ($query !== null) {
             $this->query = $query;
         } else {
+            $this->table = $table;
             $this->query = "SELECT * FROM {$table}";
         }
     }
@@ -23,6 +33,7 @@ class Query
 
     public function where($where)
     {
+        // если нет table то использовался query и не выполнять это
         $this->query .= " WHERE ";
         if (is_array($where)) {
             $where_temp = [];
@@ -56,6 +67,7 @@ class Query
         return new Entity($this->db, $this->table, $data);
     }
 
+    // return Array Object
     public function entityAll()
     {
 

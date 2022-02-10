@@ -1,5 +1,6 @@
 <?php
 require_once 'core/errors/errors.php';
+require_once 'core/debug/debug.php';
 require_once 'core/classes/cache.php';
 require_once 'core/patterns/singleton.php';
 

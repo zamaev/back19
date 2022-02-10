@@ -23,15 +23,17 @@ class Entity
         if (in_array($name, array_keys($this->data))) {
             return $this->data[$name];
         } else {
-            throw new Exception('entity has not option');
+            throw new Exception('entity has no option');
         }
     }
 
-    // запретить менять id
+    // TODO запретить менять id
     public function __set($name, $value)
     {
         if (in_array($name, array_keys($this->data)) && $name !== $this->entity) {
-            $this->changed[$name] = $value;
+            if ($this->data[$name] !== $value) {
+                $this->changed[$name] = $value;
+            }
         } else {
             throw new Exception('invalid entity option');
         }
@@ -40,7 +42,15 @@ class Entity
 
     public function __destruct()
     {
+        $this->save();
+    }
+
+
+    // перенести сюда
+    public function save()
+    {
         // сделать в одном, создать или обновить при существовании
+        // проверить что объект не удалялся
 
         if (empty($this->entity_id)) {
             $columns = [];
@@ -53,6 +63,7 @@ class Entity
             $values = implode(', ', $values);
             $query = "INSERT INTO `users` ({$columns}) VALUES ({$values});";
             $this->db->query($query);
+            debug('создание объекта');
 
         } else if (!empty($this->changed)) {
             $updates = [];
@@ -62,8 +73,11 @@ class Entity
             $updates = implode(', ', $updates);
             $query = "UPDATE `{$this->table}` SET {$updates} WHERE `{$this->entity}` = {$this->entity_id}";
             $this->db->query($query);
+            debug('обновление объекта');
         }
+
     }
+
 
     // delete changed for remove function
     public function remove() {
