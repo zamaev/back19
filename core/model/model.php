@@ -4,7 +4,7 @@
  * $model->user(2);	- return Entity object
  * $model->user(['name' => 'user1']); - return Entity object
  * 
- * $model->user - return empty Entity for create new table row
+ * $model->user() - return empty Entity for create new table row
  * 
  * 
  * $model->query($query) - return Query object with query
@@ -72,39 +72,55 @@ class Model extends Singleton
 	public function isTable($name)
 	{
 		$tables = array_keys($this->tables);
-		return in_array($name, $tables);
+		return in_array($name, $tables) ? $this->tables[$name] : null;
 	}
 
 	public function isEntity($name)
 	{
 		$entities = array_keys($this->entities);
-		return in_array($name, $entities);
+		return in_array($name, $entities) ? $this->entities[$name] : null;
 	}
 
+
+	/**
+	 * $model->user(2);	- return Entity object by `id`
+	 * $model->user(['name' => 'user1']); - return Entity object by WHERE
+	 * $model->user() - return empty Entity for create new table row if changed this
+	 * 
+	 * $model->users([...]) - return Query object with `table` and `where` params
+	 */
 	public function __call($name, $arguments)
 	{
-		$options = $arguments[0];
-		if ($options === null) {
-			throw new Exception('need options');
-		} else if (!is_array($options)) {
-			$options = [$name => $options];
+		if ($table = $this->isEntity($name)) {
+
+			$where = null;
+			if (!empty($arguments)) {
+				if (is_array($arguments[0])) {
+					$where = $arguments[0];
+				} else {
+					$where = [$name => $arguments[0]];
+				}
+			}
+
+			if ($where === null) {
+				$entity_feilds = $this->tables[$table];
+				$data = array_fill_keys($entity_feilds, null);
+				return new Entity($this->db, $table, $data);
+			} else {
+				return $this->{$table}->where($where)->entity();
+			}
+
+		} else if ($this->isTable($name) && !empty($arguments) && is_array($arguments[0])) {
+			return $this->{$name}->where($arguments[0]);
 		}
 
-		if ($this->isEntity($name)) {
-			$table = $this->entities[$name];
-			return $this->{$table}->where($options)->entity();
-
-		} else if ($this->isTable($name)) {
-			$query = new Query($this->db, $name);
-			$query->where($options);
-			return $query;
-
-		} else {
-			throw new Exception("don't have entity");
-		}
-
+		return null;
 	}
 
+
+	/**
+	 * 
+	 */
 	public function __get($name)
 	{
 		if ($this->isEntity($name)) {
@@ -130,13 +146,10 @@ class Model extends Singleton
 
 $model = Model::getInstance();
 
-// $user = $model->user;
-$user = $model->user(5);
+// $user = $model->user(5);
+// $user->password = 'pas0ds00ord33';
 
-
-// $user->name = 'test';
-$user->password = 'pas0ds00ord33';
-
+$user = $model->user(2);
 
 debug($user);
 

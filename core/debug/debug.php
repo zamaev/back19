@@ -2,7 +2,7 @@
 
 function debug($data)
 {
-    echo "<pre>";
+    echo "\n<pre>\n";
     print_r($data);
-    echo "<pre>";
+    echo "\n</pre>\n";
 }

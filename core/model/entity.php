@@ -4,7 +4,7 @@ class Entity
 {
     private $db;
     private $table;
-    private $entity;
+    private $entity_name;
     private $entity_id;
     private $data;
     private $changed;
@@ -14,8 +14,10 @@ class Entity
         $this->db = $db;
         $this->table = $table;
         $this->data = $data;
-        $this->entity = array_keys($data)[0];
-        $this->entity_id = $data[$this->entity];
+        var_dump($data);
+
+        $this->entity_name = array_keys($data)[0];
+        $this->entity_id = $data[$this->entity_name];
     }
 
     public function __get($name)
@@ -30,7 +32,7 @@ class Entity
     // TODO запретить менять id
     public function __set($name, $value)
     {
-        if (in_array($name, array_keys($this->data)) && $name !== $this->entity) {
+        if (in_array($name, array_keys($this->data)) && $name !== $this->entity_name) {
             if ($this->data[$name] !== $value) {
                 $this->changed[$name] = $value;
             }
@@ -52,7 +54,7 @@ class Entity
         // сделать в одном, создать или обновить при существовании
         // проверить что объект не удалялся
 
-        if (empty($this->entity_id)) {
+        if (empty($this->entity_id) && !empty($this->changed)) {
             $columns = [];
             $values = [];
             foreach ($this->changed as $k => $v) {
@@ -71,7 +73,7 @@ class Entity
                 $updates[] = "`{$k}` = '{$v}'";
             }
             $updates = implode(', ', $updates);
-            $query = "UPDATE `{$this->table}` SET {$updates} WHERE `{$this->entity}` = {$this->entity_id}";
+            $query = "UPDATE `{$this->table}` SET {$updates} WHERE `{$this->entity_name}` = {$this->entity_id}";
             $this->db->query($query);
             debug('обновление объекта');
         }
