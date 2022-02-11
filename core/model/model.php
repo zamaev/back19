@@ -1,20 +1,8 @@
 <?php
 
 /**
- * $model->user(2);	- return Entity object
- * $model->user(['name' => 'user1']); - return Entity object
- * 
- * $model->user() - return empty Entity for create new table row
- * 
- * 
- * $model->query($query) - return Query object with query
- * 
- * $model->users; - return Query object with table 'users'
- * $model->users([...]) - return Query object with `table` 'users' and `where` params
  * 
  */
-
-
 class Model extends Singleton
 {
     private $db;
@@ -64,6 +52,9 @@ class Model extends Singleton
 		}
 	}
 
+	/**
+	 * $model->query($query) - return Query object with query
+	 */
     public function query($query)
     {
         return new Query($this->db, null, $query);
@@ -119,22 +110,14 @@ class Model extends Singleton
 
 
 	/**
-	 * 
+	 * $model->users; - return Query object with table 'users'
 	 */
 	public function __get($name)
 	{
-		if ($this->isEntity($name)) {
-			$table = $this->entities[$name];
-			$table_keys = $this->tables[$table];
-			$data = array_fill_keys($table_keys, null);
-			return new Entity($this->db, $table, $data);
-
-		} else if ($this->isTable($name)) {
+		if ($this->isTable($name)) {
 			return new Query($this->db, $name);
-
-		} else {
-			throw new Exception("don't have table");
 		}
+		return null;
 	}
 
 
