@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * $model = Model::getInstance();
+ * $user = $model->user(5);
+ */
+
 class Model extends Singleton
 {
     private $db;
@@ -126,14 +131,3 @@ class Model extends Singleton
 	// public function __set() {}
 
 }
-
-
-$model = Model::getInstance();
-
-// $user = $model->user(5);
-// $user->password = 'pas0ds00ord33';
-
-$user = $model->user(15)->remove();
-
-debug($user);
-

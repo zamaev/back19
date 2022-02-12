@@ -1,4 +1,5 @@
 <?php
+
 abstract class Singleton
 {
 	private static $instances = [];
