@@ -10,6 +10,14 @@
  * 
  */
 
+/**
+ * пока не знаю стоит ли в конструкторе формировать select
+ * вдург я добавлю insert и update
+ * хотя эти задачи и решает entity
+ * 
+ * возможно я отдельно вынесу select и не буду через конструктор его определять
+ */
+ 
 class Query
 {
     private $db;
@@ -47,6 +55,11 @@ class Query
         return $this;
     }
 
+    /**
+     * в таком случае не выдавать entity наверное
+     */
+    // public function join() {}
+
     public function fetch()
     {
         if (empty($this->result)) {
@@ -63,16 +76,16 @@ class Query
 
     public function entity()
     {
-        $data = $this->fetch();
-        return new Entity($this->db, $this->table, $data);
+        if ($data = $this->fetch()) {
+            return new Entity($this->db, $this->table, $data);
+        }
+        return null;
     }
 
-    // return Array Object
-    // скорее это не нужно потому что можно будет каждый раз вызывать entity() и получать следующий объект - занести это в документацию
-    // дополнительно можно создать метод возвращающий массив из entite созданный вызыванием entity и заполненем массива
     public function entities()
     {
-
+        for ($entities = null; $e = $this->entity(); $entities[] = $e);
+        return $entities;
     }
 
 }

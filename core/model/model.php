@@ -1,8 +1,5 @@
 <?php
 
-/**
- * 
- */
 class Model extends Singleton
 {
     private $db;
@@ -13,7 +10,7 @@ class Model extends Singleton
 
     protected function __construct()
     {
-		extract(require('config/db.php'));
+		list('host' => $host, 'user' => $user, 'pass' => $pass, 'name' => $name) = require('config/db.php');
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         try {
             $this->db = new mysqli($host, $user, $pass, $name) or die('not connect to db');
@@ -23,6 +20,10 @@ class Model extends Singleton
 		$this->initTables();
     }
 
+	/**
+	 * возможно буду брать нужные таблицы из конфига, а не все подгружать
+	 * чтобы оставить таблицы с для сайта, а так же с данными для управления
+	 */
 	private function initTables()
 	{
 		$tables = Cache::get('tables');
@@ -72,12 +73,12 @@ class Model extends Singleton
 		return in_array($name, $entities) ? $this->entities[$name] : null;
 	}
 
-
 	/**
 	 * $model->user(2);	- return Entity object by `id`
 	 * $model->user(['name' => 'user1']); - return Entity object by WHERE
 	 * $model->user() - return empty Entity for create new table row if changed this
 	 * 
+	 * $model->users() == $model->users - return Query object with table
 	 * $model->users([...]) - return Query object with `table` and `where` params
 	 */
 	public function __call($name, $arguments)
@@ -92,7 +93,6 @@ class Model extends Singleton
 					$where = [$name => $arguments[0]];
 				}
 			}
-
 			if ($where === null) {
 				$entity_feilds = $this->tables[$table];
 				$data = array_fill_keys($entity_feilds, null);
@@ -103,11 +103,13 @@ class Model extends Singleton
 
 		} else if ($this->isTable($name) && !empty($arguments) && is_array($arguments[0])) {
 			return $this->{$name}->where($arguments[0]);
+
+		} else if ($this->isTable($name)) {
+			return $this->{$name};
 		}
 
 		return null;
 	}
-
 
 	/**
 	 * $model->users; - return Query object with table 'users'
@@ -120,8 +122,7 @@ class Model extends Singleton
 		return null;
 	}
 
-
-	// создание новой записи в таблице с использованием либо существующей entity либо через data array
+	// для общих настроек из таблицы settings
 	// public function __set() {}
 
 }
@@ -132,8 +133,7 @@ $model = Model::getInstance();
 // $user = $model->user(5);
 // $user->password = 'pas0ds00ord33';
 
-$user = $model->user(2);
+$user = $model->user(15)->remove();
 
 debug($user);
-
 
