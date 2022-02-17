@@ -42,12 +42,14 @@ class Model extends Singleton
 			if (empty($data)) {
 				throw new Exception('empty db');
 			}
-			$tables = array_column($data, 0);
-
+			$tables = [];
+			foreach ($data as $table) {
+				$tables[] = array_values($table)[0];
+			}
 			foreach($tables as $table) {
 				$table_data = $this->query('DESCRIBE '.$table)->fetchAll();
 
-				$table_columns = array_column($table_data, 0);
+				$table_columns = array_column($table_data, 'Field');
 				$this->tables[$table] = $table_columns;
 
 				$entity = $table_columns[0];
@@ -78,6 +80,9 @@ class Model extends Singleton
 		return in_array($name, $entities) ? $this->entities[$name] : null;
 	}
 
+
+	// TODO Добавить второй аргумент функции, для join чтобы брать смежные таблицы с данными
+
 	/**
 	 * $model->user(2);	- return Entity object by `id`
 	 * $model->user(['name' => 'user1']); - return Entity object by WHERE
@@ -88,32 +93,39 @@ class Model extends Singleton
 	 */
 	public function __call($name, $arguments)
 	{
-		if ($table = $this->isEntity($name)) {
-
-			$where = null;
-			if (!empty($arguments)) {
-				if (is_array($arguments[0])) {
-					$where = $arguments[0];
-				} else {
-					$where = [$name => $arguments[0]];
-				}
+		$where = null;
+		if (!empty($arguments)) {
+			if (is_array($arguments[0])) {
+				$where = $arguments[0];
+			} else if ($this->isEntity($name)) {
+				$where = [$name => $arguments[0]];
+			} else if ($this->isTable($name)) {
+				$entity = $this->tables[$name][0];
+				$where = [$entity => $arguments[0]];
 			}
-			if ($where === null) {
+		}
+
+		if ($table = $this->isEntity($name)) {
+			
+			if ($where) {
+				return $this->{$table}->where($where)->entity();
+			} else {
 				$entity_feilds = $this->tables[$table];
 				$data = array_fill_keys($entity_feilds, null);
 				return new Entity($this->db, $table, $data);
-			} else {
-				return $this->{$table}->where($where)->entity();
 			}
 
-		} else if ($this->isTable($name) && !empty($arguments) && is_array($arguments[0])) {
-			return $this->{$name}->where($arguments[0]);
-
 		} else if ($this->isTable($name)) {
-			return $this->{$name};
+
+			if ($where) {
+				return $this->{$name}->where($where);
+			} else {
+				return $this->{$name};
+			}
+
 		}
 
-		return null;
+		throw new Exception('invalid entity or table - '. $name);
 	}
 
 	/**

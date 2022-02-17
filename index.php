@@ -9,22 +9,37 @@ require_once 'core/model/entity.php';
 require_once 'core/model/query.php';
 require_once 'core/model/model.php';
 
-$model = Model::getInstance();
+require_once 'core/routing/page.php';
+
 
 $url = $_SERVER['REQUEST_URI'];
 $url = str_replace('?'.$_SERVER['QUERY_STRING'], '', $url);
+if (!preg_match('#/$#', $url)) {
+    header('Location: '.$url.'/');
+}
 
-$html = file_get_contents('app/templates/layout.html');
+$html = file_get_contents('app/view/layout.html');
 
-if (preg_match('#/blog/#', $url)) {
+
+if (preg_match('#/blog/$#', $url)) {
+    require('app/controller/blog.php');
+    $page = new Blog();
+
+} else if (preg_match('#/blog/([0-9a-z_-])#', $url, $params)) {
+    require('app/controller/blogPost.php');
+    $page = new BlogPost($params[1]);
+
+} else {
+    require('app/controller/errorPage.php');
+    $page = new ErrorPage();
 
 }
 
-if (preg_match('#/blog/([0-9a-z_-])#', $url, $params)) {
 
-}
+$html = str_replace('{{ title }}', $page->title(), $html);
+$html = str_replace('{{ content }}', $page->view(), $html);
 
-
+echo $html;
 
 exit;
 

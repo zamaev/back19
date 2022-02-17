@@ -89,9 +89,15 @@ class Entity
 
     }
 
-    public function remove() {
+    public function remove()
+    {
         $this->changed = null;
         $this->db->query("DELETE FROM `{$this->table}` WHERE `{$this->entity_name}` = {$this->entity_id}");
+    }
+
+    public function data()
+    {
+        return $this->data;
     }
 
 }

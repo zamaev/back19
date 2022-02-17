@@ -71,7 +71,7 @@ class Query
     public function fetchAll()
     {
         $result = $this->db->query($this->query);
-		return mysqli_fetch_all($result);
+		return mysqli_fetch_all($result, MYSQLI_ASSOC);
     }
 
     public function entity()
