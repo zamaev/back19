@@ -21,11 +21,19 @@ if (!preg_match('#/$#', $url)) {
 $html = file_get_contents('app/view/layout.html');
 
 
-if (preg_match('#/blog/$#', $url)) {
+if (preg_match('#^/$#', $url)) {
+    require('app/controller/home.php');
+    $page = new Home();
+
+} else if (preg_match('#/blog/$#', $url)) {
     require('app/controller/blog.php');
     $page = new Blog();
 
-} else if (preg_match('#/blog/([0-9a-z_-])#', $url, $params)) {
+} else if (preg_match('#/blog/add/#', $url)) {
+    require('app/controller/blogPostAdd.php');
+    $page = new BlogPostAdd();
+
+} else if (preg_match('#/blog/([0-9a-z_-])/#', $url, $params)) {
     require('app/controller/blogPost.php');
     $page = new BlogPost($params[1]);
 

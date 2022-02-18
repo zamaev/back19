@@ -7,6 +7,11 @@ class BlogPost extends Page
     public function __construct($param)
     {
         $model = Model::getInstance();
-        list('title' => $this->title, 'content' => $this->content) = $model->posts($param)->fetch();
+        $post = $model->posts($param)->fetch();
+
+        $this->title = 'Post: '.$post['title'];
+        
+        $this->vars['title'] = $post['title'];
+        $this->vars['content'] = $post['content'];
     }
 }

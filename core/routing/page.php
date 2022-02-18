@@ -3,18 +3,19 @@
 class Page
 {
     protected $title;
-    protected $content;
+    protected $vars = [];
     
-    public function view()
-    {
-        $html = file_get_contents($this->template);
-        $html = str_replace('{{ title }}', $this->title, $html);
-        $html = str_replace('{{ content }}', $this->content, $html);
-        return $html;
-    }
-
     public function title()
     {
         return $this->title;
+    }
+
+    public function view()
+    {
+        $html = file_get_contents($this->template);
+        foreach ($this->vars as $var => $value) {
+            $html = str_replace("{{ {$var} }}", $value, $html);
+        }
+        return $html;
     }
 }
