@@ -6,9 +6,10 @@ class ErrorPage extends Page
 
     public function __construct()
     {
-        $model = Model::getInstance();
         $this->title = '404';
-        $this->content = 'Page not found';
+                
+        $this->vars['title'] = '404';
+        $this->vars['content'] = 'Page not found';
     }
 
 }

@@ -16,6 +16,10 @@ class Page
         foreach ($this->vars as $var => $value) {
             $html = str_replace("{{ {$var} }}", $value, $html);
         }
+        preg_match_all('#{{ [0-9a-z_-]* }}#', $html, $match);
+        foreach ($match as $var) {
+            $html = str_replace($var, '', $html);
+        }
         return $html;
     }
 }

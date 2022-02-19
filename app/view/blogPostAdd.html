@@ -1,0 +1,17 @@
+<h1 class="mb-4">Add post</h1>
+{{ error }}
+<form method="post" actoin="./">
+    <div class="mb-3">
+        <label for="postTitle" class="form-label">Title</label>
+        <input type="text" class="form-control" id="postTitle" name="post[title]" value="{{ title }}" autocomplete="off">
+    </div>
+    <div class="mb-3">
+        <label for="postSlug" class="form-label">Slug</label>
+        <input type="text" class="form-control" id="postSlug" name="post[slug]" value="{{ slug }}" autocomplete="off">
+    </div>
+    <div class="mb-3">
+        <label for="postContent" class="form-label">Content</label>
+        <textarea id="postContent" cols="30" rows="10" class="form-control" name="post[content]">{{ content }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Publish</button>
+</form>

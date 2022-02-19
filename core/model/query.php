@@ -65,13 +65,14 @@ class Query
         if (empty($this->result)) {
             $this->result = $this->db->query($this->query);
         }
-		return mysqli_fetch_assoc($this->result);
+		return $this->result->fetch_assoc();
+		// return mysqli_fetch_assoc($this->result);
     }
 
     public function fetchAll()
     {
         $result = $this->db->query($this->query);
-		return mysqli_fetch_all($result, MYSQLI_ASSOC);
+		return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public function entity()
