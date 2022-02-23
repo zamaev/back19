@@ -7,7 +7,7 @@ class Blog extends Page
     public function __construct()
     {
         $model = Model::getInstance();
-        $posts = $model->posts()->fetchAll();
+        $posts = $model->posts()->order('post', 'desc')->fetchAll();
 
         $this->title = 'All posts';
 
@@ -17,7 +17,7 @@ class Blog extends Page
             $content .= <<<HTML
                 <div class="col">
                     <div class="card">
-                        <img src="https://picsum.photos/320/180?{$rand}" class="card-img-top" alt="{$post['title']}">
+                        <img loading="lazy" src="https://picsum.photos/320/180?{$rand}" class="card-img-top" alt="{$post['title']}">
                         <div class="card-body">
                             <h5 class="card-title">{$post['title']}</h5>
                             <p class="card-text">{$post['content']}</p>

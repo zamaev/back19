@@ -14,6 +14,8 @@ require_once 'core/routing/page.php';
 
 $url = $_SERVER['REQUEST_URI'];
 $url = str_replace('?'.$_SERVER['QUERY_STRING'], '', $url);
+
+// эту штуку нужно отменить на файлах, чтобы не было редиректа
 if (!preg_match('#/$#', $url)) {
     header('Location: '.$url.'/');
 }

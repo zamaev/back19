@@ -16,6 +16,8 @@ class Entity
     private $data;
     private $changed = [];
 
+    private $removed = false;
+
 
     public function __construct(&$db, $table, $data)
     {
@@ -29,6 +31,7 @@ class Entity
 
     /**
      * дополнить получением связанных данных из join таблиц
+     * если нет такого поля, то искать связанные таблицы
      */
     public function __get($name)
     {
@@ -75,6 +78,9 @@ class Entity
      */
     public function save()
     {
+        if ($this->removed) {
+            return null;
+        }
         if (empty($this->entity_id) && !empty($this->changed)) {
             $columns = [];
             $values = [];
@@ -112,8 +118,8 @@ class Entity
 
     public function remove()
     {
-        $this->changed = null;
         $this->db->query("DELETE FROM `{$this->table}` WHERE `{$this->entity_name}` = {$this->entity_id}");
+        $this->removed = true;
     }
 
     public function __destruct()

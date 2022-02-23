@@ -22,37 +22,96 @@ class Query
 {
     private $db;
     private $table;
+
+    private $type = 'SELECT';
+    private $fields = '*';
+    private $where = '';
+    private $order = '';
+    
+    private $insert;
+    private $update;
+
     private $query;
     private $result;
 
     public function __construct(&$db, $table, $query = null)
     {
         $this->db = $db;
-        if ($query !== null) {
-            $this->query = $query;
-        } else {
-            $this->table = $table;
-            $this->query = "SELECT * FROM {$table}";
-        }
+        $this->table = $table;
+        $this->query = $query;
     }
 
-    // public function update() {}
-    // public function remove() {}
+    // beta протестить
+    // возможно сразе же вызвать fetch()
+    public function insert($data)
+    {
+        $this->type = 'INSERT';
+        $fileds = [];
+        $values = [];
+        foreach ($data as $f => $v) {
+            $fileds[] = $f;
+            $values[] = $v;
+        }
+        $this->insert = '('. implode(', ', $fileds) .') VALUES ('. implode(', ', $values) .')';
+        return $this;
+    }
+
+    // beta протестить
+    // возможно сразе же вызвать fetch()
+    public function update($data) {
+        $this->type = 'UPDATE';
+        $sets = [];
+        foreach ($data as $f => $v) {
+            $sets[] = $f.' = '.$v;
+        }
+        $this->update = implode(', ', $sets);
+        return $this;
+    }
+
+    // beta протестить
+    // возможно сразе же вызвать fetch()
+    public function delete() {
+        $this->type = 'DELETE';
+        return $this;
+    }
 
     public function where($where)
     {
-        // если нет table то использовался query и не выполнять это
-        $this->query .= " WHERE ";
+        $this->where .= " WHERE ";
         if (is_array($where)) {
             $where_temp = [];
             foreach ($where as $k => $v) {
                 $where_temp[] = '`'.$k.'` = \''.$v.'\'';
             }
-            $this->query .= implode(' AND ', $where_temp);
+            $this->where .= implode(' AND ', $where_temp);
         } else {
-            $this->query .= $where;
+            $this->where .= $where;
         }
         return $this;
+    }
+
+    public function order($fields, $type) {
+        $this->order = 'ORDER BY '.$fields.' '.$type;
+        return $this;
+    }
+
+    public function buildQuery()
+    {
+        if ($this->query) {
+            return;
+        }
+        if ($this->type = 'SELECT') {
+            $this->query = $this->type.' '.$this->fields.' FROM '.$this->table;
+        } else if ($this->type = 'INSERT') {
+            $this->query = $this->type.' INTO '.$this->table.' '.$this->insert;
+        } else if ($this->type = 'UPDATE') {
+            $this->query = $this->type.' '.$this->table.' SET '.$this->update;
+        } else if ($this->type = 'DELETE') {
+            $this->query = $this->type.' FROM '.$this->table;
+        }
+        $this->query .= ' '.$this->where;
+        $this->query .= ' '.$this->order;
+
     }
 
     /**
@@ -63,14 +122,15 @@ class Query
     public function fetch()
     {
         if (empty($this->result)) {
+            $this->buildQuery();
             $this->result = $this->db->query($this->query);
         }
 		return $this->result->fetch_assoc();
-		// return mysqli_fetch_assoc($this->result);
     }
 
     public function fetchAll()
     {
+        $this->buildQuery();
         $result = $this->db->query($this->query);
 		return $result->fetch_all(MYSQLI_ASSOC);
     }
