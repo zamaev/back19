@@ -2,8 +2,6 @@
 
 class Blog extends Page
 {
-    protected $template = 'app/view/blog.html';
-
     public function __construct()
     {
         $model = Model::getInstance();

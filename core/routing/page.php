@@ -4,15 +4,10 @@ class Page
 {
     protected $title;
     protected $vars = [];
-    
-    public function title()
-    {
-        return $this->title;
-    }
 
     public function view()
     {
-        $html = file_get_contents($this->template);
+        $html = file_get_contents(__DIR__.'/../../app/view/'.static::class.'.html');
         foreach ($this->vars as $var => $value) {
             $html = str_replace("{{ {$var} }}", $value, $html);
         }
@@ -21,5 +16,18 @@ class Page
             $html = str_replace($var, '', $html);
         }
         return $html;
+    }
+
+    public function render()
+    {
+        $html = file_get_contents(__DIR__.'/../../app/view/'.self::class.'.html');
+        $html = str_replace('{{ title }}', $this->title, $html);
+        $html = str_replace('{{ content }}', $this->view(), $html);
+        echo $html;
+    }
+
+    public function __destruct()
+    {
+        $this->render();
     }
 }

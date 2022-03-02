@@ -2,8 +2,6 @@
 
 class BlogPost extends Page
 {
-    protected $template = 'app/view/blogPost.html';
-
     public function __construct($slug)
     {
         $model = Model::getInstance();
