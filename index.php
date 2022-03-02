@@ -14,6 +14,7 @@ require_once 'core/routing/page.php';
 
 $url = $_SERVER['REQUEST_URI'];
 $url = str_replace('?'.$_SERVER['QUERY_STRING'], '', $url);
+$url = urldecode($url);
 
 // эту штуку нужно отменить на файлах, чтобы не было редиректа
 if (!preg_match('#/$#', $url)) {
@@ -33,7 +34,13 @@ if (preg_match('#^/$#', $url)) {
     require('app/controller/blogPostAdd.php');
     $page = new BlogPostAdd();
 
-} else if (preg_match('#/blog/(?<slug>[0-9a-zA-Z_-]+)/#', $url, $params)) {
+} else if (preg_match('#/blog/edit/(?<slug>.+)/#', $url, $params)) {
+
+} else if (preg_match('#/blog/delete/(?<slug>.+)/#', $url, $params)) {
+    require('app/controller/blogPostDelete.php');
+    new BlogPostDelete($params['slug']);
+
+} else if (preg_match('#/blog/(?<slug>.+)/#', $url, $params)) {
     require('app/controller/blogPost.php');
     $page = new BlogPost($params['slug']);
 

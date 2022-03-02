@@ -16,7 +16,7 @@ class Entity
     private $data;
     private $changed = [];
 
-    private $removed = false;
+    private $deleted = false;
 
 
     public function __construct(&$db, $table, $data)
@@ -78,7 +78,7 @@ class Entity
      */
     public function save()
     {
-        if ($this->removed) {
+        if ($this->deleted) {
             return null;
         }
         if (empty($this->entity_id) && !empty($this->changed)) {
@@ -116,10 +116,10 @@ class Entity
         return $this;
     }
 
-    public function remove()
+    public function delete()
     {
         $this->db->query("DELETE FROM `{$this->table}` WHERE `{$this->entity_name}` = {$this->entity_id}");
-        $this->removed = true;
+        $this->deleted = true;
     }
 
     public function __destruct()

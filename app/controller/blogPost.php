@@ -13,5 +13,6 @@ class BlogPost extends Page
         
         $this->vars['title'] = $post['title'];
         $this->vars['content'] = $post['content'];
+        $this->vars['delete'] = '/blog/delete/'.$slug.'/';
     }
 }

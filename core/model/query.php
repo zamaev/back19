@@ -75,6 +75,13 @@ class Query
         return $this;
     }
 
+    
+    /**
+     * в таком случае не выдавать entity наверное
+     */
+    // public function join() {}
+    
+
     public function where($where)
     {
         $this->where .= " WHERE ";
@@ -95,6 +102,7 @@ class Query
         return $this;
     }
 
+
     private function buildQuery()
     {
         if ($this->query) {
@@ -113,10 +121,6 @@ class Query
         $this->query .= ' '.$this->order;
     }
 
-    /**
-     * в таком случае не выдавать entity наверное
-     */
-    // public function join() {}
 
     public function fetch()
     {
