@@ -95,7 +95,7 @@ class Query
         return $this;
     }
 
-    public function buildQuery()
+    private function buildQuery()
     {
         if ($this->query) {
             return;
@@ -111,7 +111,6 @@ class Query
         }
         $this->query .= ' '.$this->where;
         $this->query .= ' '.$this->order;
-
     }
 
     /**
