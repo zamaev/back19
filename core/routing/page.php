@@ -2,8 +2,14 @@
 
 class Page
 {
+    protected $isset = true;
     protected $title;
     protected $vars = [];
+
+    public function isset()
+    {
+        return $this->isset;
+    }
 
     public function view()
     {
@@ -20,14 +26,16 @@ class Page
 
     public function render()
     {
-        $html = file_get_contents(__DIR__.'/../../app/view/'.self::class.'.html');
-        $html = str_replace('{{ title }}', $this->title, $html);
+        $layout = file_get_contents(__DIR__.'/../../app/view/'.self::class.'.html');
+        $html = str_replace('{{ title }}', $this->title, $layout);
         $html = str_replace('{{ content }}', $this->view(), $html);
         echo $html;
     }
 
     public function __destruct()
     {
-        $this->render();
+        if ($this->isset) {
+            $this->render();
+        }
     }
 }

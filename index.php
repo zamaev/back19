@@ -10,6 +10,7 @@ require_once 'core/model/query.php';
 require_once 'core/model/model.php';
 
 require_once 'core/routing/page.php';
+require_once 'core/routing/router.php';
 
 
 $url = $_SERVER['REQUEST_URI'];
@@ -20,33 +21,9 @@ if (!preg_match('#/$#', $url)) {
 }
 
 
-if (preg_match('#^/$#', $url)) {
-    require('app/controller/Home.php');
-    new Home();
+$routing = require('config/routing.php');
+Router::route($url, $routing);
 
-} else if (preg_match('#/blog/$#', $url)) {
-    $route = 'Blog';
-    require('app/controller/'.$route.'.php');
-    new $route();
-
-} else if (preg_match('#/blog/add/#', $url)) {
-    require('app/controller/BlogPostAdd.php');
-    new BlogPostAdd();
-
-} else if (preg_match('#/blog/edit/(?<slug>.+)/#', $url, $params)) {
-
-} else if (preg_match('#/blog/delete/(?<slug>.+)/#', $url, $params)) {
-    require('app/controller/BlogPostDelete.php');
-    new BlogPostDelete($params['slug']);
-
-} else if (preg_match('#/blog/(?<slug>.+)/#', $url, $params)) {
-    require('app/controller/BlogPost.php');
-    new BlogPost($params['slug']);
-
-} else {
-    require('app/controller/ErrorPage.php');
-    new ErrorPage();
-}
 
 
 
