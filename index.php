@@ -25,6 +25,9 @@ $routing = require('config/routing.php');
 Router::route($url, $routing);
 
 
+$model = Model::getInstance();
+debug($model->post(1));
+
 
 
 // require_once 'core/classes/session.php';

@@ -68,14 +68,6 @@ class Entity
         return $this->data;
     }
 
-    // вернуть data, чтобы в дальнейшем с этим работать
-    /**
-     * проверить что объект не удалялся (если будет единый механизм одного объекта)
-     * 
-     * user 
-     * { user->remove() }
-     * user 
-     */
     public function save()
     {
         if ($this->deleted) {
