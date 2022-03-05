@@ -38,12 +38,12 @@ class Model extends Singleton
 			$this->entities = $entities;
 
 		} else {
-			$data = $this->query('SHOW tables')->fetchAll();
-			if (empty($data)) {
+			$db_tables = $this->query('SHOW tables')->fetchAll();
+			if (empty($db_tables)) {
 				throw new Exception('empty db');
 			}
 			$tables = [];
-			foreach ($data as $table) {
+			foreach ($db_tables as $table) {
 				$tables[] = array_values($table)[0];
 			}
 			foreach($tables as $table) {

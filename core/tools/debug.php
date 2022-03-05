@@ -1,8 +1,10 @@
 <?php
 
-function debug($data)
+function debug()
 {
-    echo "\n<pre>\n";
-    print_r($data);
-    echo "\n</pre>\n";
+    foreach (func_get_args() as $data) {
+        echo "\n<pre>\n";
+        print_r($data);
+        echo "\n</pre>\n";
+    }
 }

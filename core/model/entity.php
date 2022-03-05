@@ -7,6 +7,8 @@
  */
 class Entity
 {
+    private $model;
+
     private $db;
     private $table;
 
@@ -19,8 +21,11 @@ class Entity
     private $deleted = false;
 
 
+    // избавиться от получения $db и $table и использовать Entity не как обертку, а получать в нем данные
     public function __construct(&$db, $table, $data)
     {
+        $this->model = Model::getInstance();
+
         $this->db = $db;
         $this->table = $table;
         $this->data = $data;
@@ -37,6 +42,19 @@ class Entity
     {
         if (in_array($name, array_keys($this->data))) {
             return $this->data[$name];
+
+        } else if (in_array($name.'__id', array_keys($this->data))) { // если есть связанная таблица
+            if ($this->data[$name.'__id']) {
+                $table = $this->model->isEntity($name);
+                return $this->model->{$table}->where([$name => $this->data[$name.'__id']])->entity();
+                 
+            } else {
+                return null;
+            }
+
+        } else if ($name == 'id') {
+            return $this->data[$this->entity_name];
+        
         } else {
             throw new Exception('entity has no filed');
         }

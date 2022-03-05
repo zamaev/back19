@@ -26,7 +26,7 @@ Router::route($url, $routing);
 
 
 $model = Model::getInstance();
-debug($model->post(1));
+debug($model->post(1)->category->id);
 
 
 
