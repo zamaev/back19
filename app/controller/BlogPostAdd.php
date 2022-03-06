@@ -11,10 +11,8 @@ class BlogPostAdd extends Page
         $content = $_POST['post']['content'] ?? null;
         
         if ($title && $slug && $content) {
-            $model = Model::getInstance();
-
-            if (!$model->post(['slug' => $slug])) {
-                $post = $model->post();
+            if (!model()->post(['slug' => $slug])) {
+                $post = model()->post();
                 $post_data = $post->setData($_POST['post'])->save()->data();
                 header('Location: /blog/'.$post_data['slug'].'/');
             

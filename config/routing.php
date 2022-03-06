@@ -7,5 +7,4 @@ return [
     '#/blog/edit/(?<slug>.+)/#' => '',
     '#/blog/delete/(?<slug>.+)/#' => 'BlogPostDelete',
     '#/blog/(?<slug>.+)/#' => 'BlogPost',
-    '#.*#' => 'ErrorPage',
 ];

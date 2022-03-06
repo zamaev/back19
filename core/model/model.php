@@ -1,21 +1,15 @@
 <?php
 
-/**
- * $model = Model::getInstance();
- * $user = $model->user(5);
- */
-
 class Model extends Singleton
 {
     private $db;
 
-	// напрямую не давать доступ, возвращать данные по запросу 
 	private $tables = [];	# table => columns
 	private $entities = [];  # entity => table
 
     protected function __construct()
     {
-		list('host' => $host, 'user' => $user, 'pass' => $pass, 'name' => $name) = require('config/db.php');
+		list('host' => $host, 'user' => $user, 'pass' => $pass, 'name' => $name) = require(__DIR__.'/../../config/db.php');
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         try {
             $this->db = new mysqli($host, $user, $pass, $name) or die('not connect to db');
@@ -27,7 +21,7 @@ class Model extends Singleton
 
 	/**
 	 * возможно буду брать нужные таблицы из конфига, а не все подгружать
-	 * чтобы оставить таблицы с для сайта, а так же с данными для управления
+	 * чтобы оставить таблицы сайта, а так же с данными для управления
 	 */
 	private function initTables()
 	{
@@ -38,7 +32,7 @@ class Model extends Singleton
 			$this->entities = $entities;
 
 		} else {
-			$db_tables = $this->query('SHOW tables')->fetchAll();
+			$db_tables = $this->db->query('SHOW tables')->fetch_all(MYSQLI_ASSOC);
 			if (empty($db_tables)) {
 				throw new Exception('empty db');
 			}
@@ -47,7 +41,7 @@ class Model extends Singleton
 				$tables[] = array_values($table)[0];
 			}
 			foreach($tables as $table) {
-				$table_data = $this->query('DESCRIBE '.$table)->fetchAll();
+				$table_data = $this->db->query('DESCRIBE '.$table)->fetch_all(MYSQLI_ASSOC);
 
 				$table_columns = array_column($table_data, 'Field');
 				$this->tables[$table] = $table_columns;
@@ -60,37 +54,27 @@ class Model extends Singleton
 		}
 	}
 
-	/**
-	 * $model->query($query) - return Query object with query
-	 */
-    public function query($query)
-    {
-        return new Query($this->db, null, $query);
-    }
 
-	public function isTable($name)
+	public function getEntityNameByTable($name)
+	{
+		$tables = array_keys($this->tables);
+		return in_array($name, $tables) ? $this->tables[$name][0] : null;
+	}
+	public function getEntityByTable($name)
 	{
 		$tables = array_keys($this->tables);
 		return in_array($name, $tables) ? $this->tables[$name] : null;
 	}
-
-	public function isEntity($name)
+	public function getTableByEntity($name)
 	{
 		$entities = array_keys($this->entities);
 		return in_array($name, $entities) ? $this->entities[$name] : null;
 	}
+	public function isTable($name) { return $this->getEntityByTable($name) ? true : false; }
+	public function isEntity($name) { return $this->getTableByEntity($name) ? true : false; }
 
 
 	// TODO Добавить второй аргумент функции, для join чтобы брать смежные таблицы с данными
-
-	/**
-	 * $model->user(2);	- return Entity object by `id`
-	 * $model->user(['name' => 'user1']); - return Entity object by WHERE
-	 * $model->user() - return empty Entity for create new table row if changed this
-	 * 
-	 * $model->users() == $model->users - return Query object with table
-	 * $model->users([...]) - return Query object with `table` and `where` params
-	 */
 	public function __call($name, $arguments)
 	{
 		$where = null;
@@ -105,41 +89,43 @@ class Model extends Singleton
 			}
 		}
 
-		if ($table = $this->isEntity($name)) {
-			
+		if ($this->isEntity($name)) {
+			$table = $this->getTableByEntity($name);
 			if ($where) {
 				return $this->{$table}->where($where)->entity();
 			} else {
 				$entity_feilds = $this->tables[$table];
 				$data = array_fill_keys($entity_feilds, null);
-				return new Entity($this->db, $table, $data);
+				return new Entity($data);
 			}
 
 		} else if ($this->isTable($name)) {
-
-			if ($where) {
-				return $this->{$name}->where($where);
-			} else {
-				return $this->{$name};
-			}
-
+			return $this->{$name}->where($where);
 		}
 
 		throw new Exception('invalid entity or table - '. $name);
 	}
 
-	/**
-	 * $model->users; - return Query object with table 'users'
-	 */
 	public function __get($name)
 	{
-		if ($this->isTable($name)) {
-			return new Query($this->db, $name);
+		if ($name == 'db') {
+			return $this->db;
+		} else if ($this->isTable($name)) {
+			return new Query($name);
 		}
 		return null;
 	}
 
-	// для общих настроек из таблицы settings
-	// public function __set() {}
+    public function query($query)
+    {
+        return new Query(null, $query);
+    }
+}
 
+function model($table = null) { 
+	if ($table) {
+		return Model::getInstance()->{$table};
+	} else {
+		return Model::getInstance(); 
+	}
 }

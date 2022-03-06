@@ -20,56 +20,51 @@
  
 class Query
 {
-    private $db;
     private $table;
 
     private $type = 'SELECT';
+
     private $fields = '*';
+
     private $where = '';
     private $order = '';
-    
-    private $insert;
-    private $update;
 
     private $query;
     private $result;
 
-    public function __construct(&$db, $table, $query = null)
+    public function __construct($table, $query = null)
     {
-        $this->db = $db;
         $this->table = $table;
         $this->query = $query;
     }
 
     // beta протестить
-    // возможно сразе же вызвать fetch()
     public function insert($data)
     {
-        $this->type = 'INSERT';
         $fileds = [];
         $values = [];
         foreach ($data as $f => $v) {
-            $fileds[] = $f;
-            $values[] = $v;
+            $fileds[] = '`'.$f.'`';
+            $values[] = "'".$v."'";
         }
-        $this->insert = '('. implode(', ', $fileds) .') VALUES ('. implode(', ', $values) .')';
-        return $this;
+        $insert = '('. implode(', ', $fileds) .') VALUES ('. implode(', ', $values) .');';
+        $query = "INSERT INTO {$this->table} {$insert}";
+        return model()->db->query($query);
     }
 
-    // beta протестить
-    // возможно сразе же вызвать fetch()
-    public function update($data) {
-        $this->type = 'UPDATE';
+    public function update($where, $data) {
         $sets = [];
         foreach ($data as $f => $v) {
-            $sets[] = $f.' = '.$v;
+            $sets[] = "`".$f."` = '".$v."'";
         }
-        $this->update = implode(', ', $sets);
-        return $this;
+        $update = implode(', ', $sets);
+
+        $this->where($where);
+        $query = "UPDATE {$this->table} SET {$update} {$this->where}";
+        return model()->db->query($query);
     }
 
     // beta протестить
-    // возможно сразе же вызвать fetch()
     public function delete() {
         $this->type = 'DELETE';
         return $this;
@@ -82,15 +77,26 @@ class Query
     // public function join() {}
     
 
+    /**
+     * $model->post(['category.slug' => 'test']) - сделать под это обработку
+     */
     public function where($where)
     {
-        $this->where .= " WHERE ";
+        if (!$where) {
+            return $this;
+        }
+        $this->where .= ' WHERE ';
         if (is_array($where)) {
             $where_temp = [];
             foreach ($where as $k => $v) {
-                $where_temp[] = '`'.$k.'` = \''.$v.'\'';
+                $where_temp[] = "`".$k."` = '".$v."'";
             }
             $this->where .= implode(' AND ', $where_temp);
+
+        } else if (is_numeric($where)) {
+            $entity = model()->getEntityNameByTable($this->table);
+            $this->where .= "`".$entity."` = '".$where."'";
+        
         } else {
             $this->where .= $where;
         }
@@ -98,7 +104,7 @@ class Query
     }
 
     public function order($fields, $type) {
-        $this->order = 'ORDER BY '.$fields.' '.$type;
+        $this->order = ' ORDER BY '.$fields.' '.$type;
         return $this;
     }
 
@@ -107,18 +113,14 @@ class Query
     {
         if ($this->query) {
             return;
+
+        } else if ($this->type == 'SELECT') {
+            $this->query = "SELECT {$this->fields} FROM {$this->table}";
+
+        } else if ($this->type == 'DELETE') {
+            $this->query = "DELETE FROM {$this->table}";
         }
-        if ($this->type = 'SELECT') {
-            $this->query = $this->type.' '.$this->fields.' FROM '.$this->table;
-        } else if ($this->type = 'INSERT') {
-            $this->query = $this->type.' INTO '.$this->table.' '.$this->insert;
-        } else if ($this->type = 'UPDATE') {
-            $this->query = $this->type.' '.$this->table.' SET '.$this->update;
-        } else if ($this->type = 'DELETE') {
-            $this->query = $this->type.' FROM '.$this->table;
-        }
-        $this->query .= ' '.$this->where;
-        $this->query .= ' '.$this->order;
+        $this->query .= $this->where . $this->order;
     }
 
 
@@ -126,7 +128,7 @@ class Query
     {
         if (empty($this->result)) {
             $this->buildQuery();
-            $this->result = $this->db->query($this->query);
+            $this->result = model()->db->query($this->query);
         }
 		return $this->result->fetch_assoc();
     }
@@ -134,21 +136,21 @@ class Query
     public function fetchAll()
     {
         $this->buildQuery();
-        $result = $this->db->query($this->query);
+        $result = model()->db->query($this->query);
 		return $result->fetch_all(MYSQLI_ASSOC);
     }
 
     public function entity()
     {
         if ($data = $this->fetch()) {
-            return new Entity($this->db, $this->table, $data);
+            return new Entity($data);
         }
         return null;
     }
 
     public function entities()
     {
-        for ($entities = null; $e = $this->entity(); $entities[] = $e);
+        for ($entities = []; $e = $this->entity(); $entities[] = $e);
         return $entities;
     }
 
