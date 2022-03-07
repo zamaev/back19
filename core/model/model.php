@@ -4,8 +4,8 @@ class Model extends Singleton
 {
     private $db;
 
-	private $tables = [];	# table => columns
-	private $entities = [];  # entity => table
+	private $tables = [];
+	private $entities = [];
 
     protected function __construct()
     {
@@ -19,10 +19,6 @@ class Model extends Singleton
 		$this->initTables();
     }
 
-	/**
-	 * возможно буду брать нужные таблицы из конфига, а не все подгружать
-	 * чтобы оставить таблицы сайта, а так же с данными для управления
-	 */
 	private function initTables()
 	{
 		$tables = Cache::get('tables');
@@ -74,7 +70,6 @@ class Model extends Singleton
 	public function isEntity($name) { return $this->getTableByEntity($name) ? true : false; }
 
 
-	// TODO Добавить второй аргумент функции, для join чтобы брать смежные таблицы с данными
 	public function __call($name, $arguments)
 	{
 		$where = null;
