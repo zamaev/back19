@@ -9,6 +9,9 @@ class BlogPostAdd extends Page
         $title = $_POST['post']['title'] ?? null;
         $slug = $_POST['post']['slug'] ?? null;
         $content = $_POST['post']['content'] ?? null;
+        $thumb = $_POST['post']['thumb'] ?? null;
+
+        $_POST['post']['category__id'] = $_POST['post']['category__id'] ?? 1;
         
         if ($title && $slug && $content) {
             if (!model()->post(['slug' => $slug])) {
@@ -28,6 +31,11 @@ class BlogPostAdd extends Page
             $this->vars['title'] = $title;
             $this->vars['slug'] = $slug;
             $this->vars['content'] = $content;
+
+        } else {
+
+            $this->vars['img'] = get_headers('https://picsum.photos/600/300', 1)['location'];
         }
+        
     }
 }

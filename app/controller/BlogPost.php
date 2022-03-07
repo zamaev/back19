@@ -4,17 +4,18 @@ class BlogPost extends Page
 {
     public function __construct($params)
     {
-        $slug = $params['slug'];
+        $category = $params['category'];
+        $post = $params['post'];
 
         $model = Model::getInstance();
-        $post = $model->posts(['slug' => $slug])->fetch();
+        $post = $model->posts->categories->where(['category.slug' => $category, 'post.slug' => $post])->fetch();
 
         if ($post) {
-            $this->title = 'Post: '.$post['title'];
+            $this->title = $post['post.title'];
         
-            $this->vars['title'] = $post['title'];
-            $this->vars['content'] = $post['content'];
-            $this->vars['delete'] = '/blog/delete/'.$slug.'/';
+            $this->vars['title'] = $post['post.title'];
+            $this->vars['content'] = $post['post.content'];
+            $this->vars['delete'] = '/blog/delete/'.$post['post.slug'].'/';
         
         } else {
             $this->isset = false;

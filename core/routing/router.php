@@ -10,12 +10,12 @@ class Router
         }
 
         $routing = require('config/routing.php');
-        
+
         foreach ($routing as $path => $class) {
             if (!preg_match('#.*/$#', $path)) {
                 $path = $path.'/'; // всегда должен быть в конце слеш
             }
-            $path = "#^".$path."$#";
+            $path = "#^".$path."$#u";
             
             if (preg_match($path, $url, $params)) {
                 require_once(__DIR__.'/../../app/controller/'.$class.'.php');
