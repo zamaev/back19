@@ -12,17 +12,11 @@ require_once 'core/model/entity.php';
 require_once 'core/routing/page.php';
 require_once 'core/routing/router.php';
 
+// require_once 'core/auth/auth.php';
+
 
 Router::route();
 
-// model();
+// debug(model()->users->order('name', 'desc')->fetchAll());
 
-// model('jobs')->insert(['major'=>'lksfj', 'salary'=>'73333']);
-// debug($query);
-// $db = model()->db;
-// $result = $db->query($query);
-// var_dump($result);
-// debug($db->query($query)->fetch_all(MYSQLI_ASSOC));
-
-// require_once 'core/classes/session.php';
-// require_once 'core/auth/auth.php';
+// model()->users->update(1, ['job' => 3]);

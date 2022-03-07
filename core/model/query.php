@@ -22,8 +22,6 @@ class Query
 {
     private $table;
 
-    private $type = 'SELECT';
-
     private $fields = '*';
 
     private $where = '';
@@ -38,7 +36,6 @@ class Query
         $this->query = $query;
     }
 
-    // beta протестить
     public function insert($data)
     {
         $fileds = [];
@@ -64,10 +61,10 @@ class Query
         return model()->db->query($query);
     }
 
-    // beta протестить
-    public function delete() {
-        $this->type = 'DELETE';
-        return $this;
+    public function delete($where) {
+        $this->where($where);
+        $query = "DELETE FROM {$this->table} {$this->where}";
+        return model()->db->query($query);
     }
 
     
@@ -108,26 +105,10 @@ class Query
         return $this;
     }
 
-
-    private function buildQuery()
-    {
-        if ($this->query) {
-            return;
-
-        } else if ($this->type == 'SELECT') {
-            $this->query = "SELECT {$this->fields} FROM {$this->table}";
-
-        } else if ($this->type == 'DELETE') {
-            $this->query = "DELETE FROM {$this->table}";
-        }
-        $this->query .= $this->where . $this->order;
-    }
-
-
     public function fetch()
     {
-        if (empty($this->result)) {
-            $this->buildQuery();
+        if (!$this->result) {
+            $this->query = "SELECT {$this->fields} FROM {$this->table} {$this->where} {$this->order}";
             $this->result = model()->db->query($this->query);
         }
 		return $this->result->fetch_assoc();
@@ -135,7 +116,7 @@ class Query
 
     public function fetchAll()
     {
-        $this->buildQuery();
+        $this->query = "SELECT {$this->fields} FROM {$this->table} {$this->where} {$this->order}";
         $result = model()->db->query($this->query);
 		return $result->fetch_all(MYSQLI_ASSOC);
     }
