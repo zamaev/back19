@@ -9,26 +9,18 @@
  * $query->entityAll()
  * 
  */
-
-/**
- * пока не знаю стоит ли в конструкторе формировать select
- * вдург я добавлю insert и update
- * хотя эти задачи и решает entity
- * 
- * возможно я отдельно вынесу select и не буду через конструктор его определять
- */
  
 class Query
 {
     private $table;
     private $fields = '*';
     private $join = '';
-    private $join_tables = [];
+    private $joined_tables = [];
 
     private $where = '';
+    private $group = '';
     private $order = '';
-
-    // private $group = '';
+    private $limit = '';
 
     private $query;
     private $result;
@@ -36,7 +28,7 @@ class Query
     public function __construct($table, $query = null)
     {
         $this->table = $table;
-        $this->join_tables[] = $table;
+        $this->joined_tables[] = $table;
         $this->query = $query;
     }
 
@@ -53,7 +45,8 @@ class Query
         return model()->db->query($query);
     }
 
-    public function update($where, $data) {
+    public function update($where, $data)
+    {
         $sets = [];
         foreach ($data as $f => $v) {
             $sets[] = "`".$f."` = '".$v."'";
@@ -65,7 +58,8 @@ class Query
         return model()->db->query($query);
     }
 
-    public function delete($where) {
+    public function delete($where)
+    {
         $this->where($where);
         $query = "DELETE FROM {$this->table} {$this->where}";
         return model()->db->query($query);
@@ -79,15 +73,15 @@ class Query
         } else if (is_array($fields)) {
             $this->fields = implode(', ', $fields);
 
-        } else if (!$fields && count($this->join_tables) > 1) {
+        } else if (!$fields && count($this->joined_tables) > 1) {
             $fields_arr = [];
-            foreach ($this->join_tables as $table) {
-                $table_fields = model()->getEntityByTable($table);
-                $table_entity_name = model()->getEntityNameByTable($table);
+            foreach ($this->joined_tables as $table) {
+                $table_fields = model()->getEntityFieldsByTable($table);
+                $table_entity_name = model()->getEntityByTable($table);
                 foreach ($table_fields as $field) {
                     if (preg_match('#(?<entity>.+)__id$#', $field, $matches)) {
                         $entity_table = model()->getTableByEntity($matches['entity']);
-                        if (in_array($entity_table, $this->join_tables)) {
+                        if (in_array($entity_table, $this->joined_tables)) {
                             continue;
                         }
                         $fields_arr[] = "{$table_entity_name}.{$field} as `{$field}`";
@@ -110,23 +104,23 @@ class Query
      * 
      * таблица имеет название entity, чтобы в where использовать 'user.name' как entity, которые возвращается в fields
      */
-    public function join($table, $type = 'LEFT')
+    public function join($join_table, $type = 'LEFT')
     {
-        foreach ($this->join_tables as $first_table) {
-            $second_table = $table;
-            $first_entity = model()->getEntityByTable($first_table);
-            $first_entity_name = model()->getEntityNameByTable($first_table);
-            $second_entity_name = model()->getEntityNameByTable($second_table);
-    
-            if (in_array($second_entity_name.'__id', $first_entity)) {
-                $second_entity_name_id = $second_entity_name.'__id';
-                $this->join .= " {$type} JOIN {$second_table} {$second_entity_name} ON {$first_entity_name}.{$second_entity_name_id} = {$second_entity_name}.{$second_entity_name}";                
-                $this->join_tables[] = $table;
+        foreach ($this->joined_tables as $table) {
+            $entity_fields = model()->getEntityFieldsByTable($table);
+            $entity = model()->getEntityByTable($table);
+            $join_entity = model()->getEntityByTable($join_table);
+            $entity_join_field = $join_entity.'__id';
+            if (in_array($entity_join_field, $entity_fields)) {
+                $join_table_new_name = $join_entity;
+                $table_new_name = $entity;
+                $this->join .= " {$type} JOIN {$join_table} {$join_table_new_name} ON {$table_new_name}.{$entity_join_field} = {$join_table_new_name}.{$join_entity}";                
+                $this->joined_tables[] = $join_table;
                 $this->fields();
                 return $this;
             }
         }
-        throw new Exception("wrong table ordr: {$first_table}->{$second_table}");
+        throw new Exception("Wrong table order '{$table}->{$join_table}' or invalid join table");
     }
 
     /**
@@ -145,9 +139,6 @@ class Query
         }
         throw new Exception($name . ' - is not a table');
     }
-    
-    // group by
-    // public function group() {}
 
     /**
      * $model->post(['category.slug' => 'test']) - сделать под это обработку
@@ -166,7 +157,7 @@ class Query
             $this->where .= implode(' AND ', $where_temp);
 
         } else if (is_numeric($where)) {
-            $entity = model()->getEntityNameByTable($this->table);
+            $entity = model()->getEntityByTable($this->table);
             $this->where .= "`".$entity."` = '".$where."'";
         
         } else {
@@ -175,21 +166,48 @@ class Query
         return $this;
     }
 
-    public function order($fields, $type) {
+    // beta - подумать как лучше использовать с having
+    public function group($group)
+    {
+        $this->group = "GROUP BY {$group}";
+        return $this;
+    }
+    public function order($fields, $type)
+    {
         $this->order = 'ORDER BY '.$fields.' '.$type;
         return $this;
     }
+    public function limit($offset, $count = null)
+    {
+        $this->limit = "LIMIT {$offset}";
+        if ($count) {
+            $this->limit .= ", {$count}";
+        }
+        return $this;
+    }
+    public function pageCount($page, $count)
+    {
+        $offset = ($page - 1) * $count;
+        $this->limit($offset, $count);
+        return $this;
+    }
+
 
     // так же используется для выполнения model()->query() без select
     public function build()
     {
         if (!$this->result) {
             if (!$this->query) {
-                $entity = model()->getEntityNameByTable($this->table);
-                $this->query = "SELECT {$this->fields} FROM {$this->table} {$entity} {$this->join} {$this->where} {$this->order}";
+                $entity = model()->getEntityByTable($this->table);
+                $this->query = "SELECT {$this->fields} FROM {$this->table} {$entity} {$this->join} {$this->where} {$this->group} {$this->order} {$this->limit}";
             }
             $this->result = model()->db->query($this->query);
         }
+    }
+    public function count() {
+        $this->fields = 'COUNT(*) as count';
+        $this->build();
+		return $this->result->fetch_assoc()['count'];
     }
     public function fetch()
     {

@@ -51,12 +51,12 @@ class Model extends Singleton
 	}
 
 
-	public function getEntityNameByTable($name)
+	public function getEntityByTable($name)
 	{
 		$tables = array_keys($this->tables);
 		return in_array($name, $tables) ? $this->tables[$name][0] : null;
 	}
-	public function getEntityByTable($name)
+	public function getEntityFieldsByTable($name)
 	{
 		$tables = array_keys($this->tables);
 		return in_array($name, $tables) ? $this->tables[$name] : null;
@@ -66,7 +66,7 @@ class Model extends Singleton
 		$entities = array_keys($this->entities);
 		return in_array($name, $entities) ? $this->entities[$name] : null;
 	}
-	public function isTable($name) { return $this->getEntityByTable($name) ? true : false; }
+	public function isTable($name) { return $this->getEntityFieldsByTable($name) ? true : false; }
 	public function isEntity($name) { return $this->getTableByEntity($name) ? true : false; }
 
 
