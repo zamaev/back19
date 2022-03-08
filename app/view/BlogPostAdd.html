@@ -1,40 +1,46 @@
-<h1 class="mb-4">Add post</h1>
-{{ error }}
+<h1 class="mb-4">{$title}</h1>
+{$error}
 <form method="post" actoin="./" class="container">
+    
     <div class="figure mb-3 d-block text-center">
-        <input type="hidden" name="post[thumb]" id="postThumb" value="{{ img }}">
+        <input type="hidden" name="post[thumb]" id="postThumb" value="{$post_thumb}">
         <div class="position-relative">
-            <img src="{{ img }}" class="rounded mx-auto d-block cursor-pointer img-fluid" role="button" alt="post.thumb" id="postThumbImg">
+            <img src="{$post_thumb}" class="rounded mx-auto d-block cursor-pointer img-fluid" role="button" alt="post.thumb" id="postThumbImg">
             <div class="spinner-border text-primary d-none2 position-absolute d-none" role="status" id="thumbSpinner" style="left: calc(50% - 12px); top: calc(50% - 12px);">
                 <span class="sr-only"></span>
             </div>
         </div>
         <figcaption class="figure-caption mt-1">Click to change picture.</figcaption>
     </div>
+
     <div class="mb-3">
         <label for="postTitle" class="form-label">Title</label>
-        <input type="text" class="form-control" id="postTitle" name="post[title]" value="{{ title }}" autocomplete="off">
+        <input type="text" class="form-control" id="postTitle" name="post[title]" value="{$post_title}" autocomplete="off" required>
     </div>
+
     <div class="mb-3">
         <label for="postSlug" class="form-label">Slug</label>
-        <input type="text" class="form-control" id="postSlug" name="post[slug]" value="{{ slug }}" autocomplete="off">
+        <input type="text" class="form-control" id="postSlug" name="post[slug]" value="{$post_slug}" autocomplete="off" required>
     </div>
+
     <div class="mb-3">
         <label for="postSlug" class="form-label">Category</label>
-        <select class="form-select" id="postCat">
-            <option selected>Open this select menu</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+        <select class="form-select" id="postCat" name="post[category__id]">
+            {foreach $categories as $cat}
+            <option {if $cat['category'] == $post_category_id} selected {/if} value="{$cat['category']}">{$cat['title']}</option>
+            {/foreach}
         </select>
     </div>
+
     <div class="mb-3">
         <label for="postContent" class="form-label">Content</label>
-        <textarea id="postContent" cols="30" rows="10" class="form-control" name="post[content]">{{ content }}</textarea>
+        <textarea id="postContent" cols="30" rows="10" class="form-control" name="post[content]" required>{$post_content}</textarea>
     </div>
+
     <button type="submit" class="btn btn-primary">Publish</button>
 </form>
 
+{literal}
 <script>
     document.getElementById('postThumbImg').addEventListener('click', e => {
         document.getElementById('thumbSpinner').classList.remove('d-none');
@@ -50,3 +56,4 @@
             });
     })
 </script>
+{/literal}

@@ -1,7 +1,12 @@
 <section>
     <div class="d-flex justify-content-between">
-        <h1>{{ title }}</h1>
-        <a href="{{ delete }}" class="bi bi-trash text-danger fs-2"></a>
+        <div class="d-flex">
+            <h1>{$title}</h1>
+            <a href="{$edit}" class="bi bi-pencil text-primary d-block fs-2 mx-3"></a>
+        </div>
+        <a href="{$delete}" class="bi bi-trash text-danger fs-2"></a>
     </div>
-    <p>{{ content }}</p>
+
+    <img src="{$thumb}" class="rounded mx-auto d-block img-fluid my-4" alt="post.thumb">
+    <p>{$content}</p>
 </section>

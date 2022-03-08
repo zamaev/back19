@@ -47,24 +47,27 @@ class Cache
      * false - ошибка
      * null - файл не найден
      */
+
+    // переделать это потому что в папке кэша есть еще папка кэша view
+
     public static function clear($name)
     {
-        if ($name == 'all') {
-            $files = glob('cache/*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    return unlink($file);
-                } else {
-                    rmdir($file);
-                }
-            }
-        } else {
-            $path = 'cache/'.$name.'.php';
-            if (file_exists($path)) {
-                return unlink($path);
-            }
-        }
-        return null;
+    //     if ($name == 'all') {
+    //         $files = glob('cache/*');
+    //         foreach ($files as $file) {
+    //             if (is_file($file)) {
+    //                 return unlink($file);
+    //             } else {
+    //                 rmdir($file);
+    //             }
+    //         }
+    //     } else {
+    //         $path = 'cache/'.$name.'.php';
+    //         if (file_exists($path)) {
+    //             return unlink($path);
+    //         }
+    //     }
+    //     return null;
     }
 }
 

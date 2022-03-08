@@ -9,10 +9,12 @@ require_once 'core/model/model.php';
 require_once 'core/model/query.php';
 require_once 'core/model/entity.php';
 
-require_once 'core/routing/page.php';
-require_once 'core/routing/router.php';
+require_once 'core/libs/smarty/Smarty.class.php';
+require_once 'core/routing/View.php';
+require_once 'core/routing/Router.php';
 
 // require_once 'core/auth/auth.php';
 
+const APP_DIR = __DIR__;
 
 Router::route();

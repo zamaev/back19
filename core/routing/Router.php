@@ -18,6 +18,9 @@ class Router
             $path = "#^".$path."$#u";
             
             if (preg_match($path, $url, $params)) {
+                if (!file_exists(__DIR__.'/../../app/controller/'.$class.'.php')) {
+                    continue;
+                }
                 require_once(__DIR__.'/../../app/controller/'.$class.'.php');
                 $page = new $class($params);
                 if ($page->isset()) {

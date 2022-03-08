@@ -1,21 +1,19 @@
 <?php
 
-class BlogPost extends Page
+class BlogPost extends View
 {
-    public function __construct($params)
+    public function run($params)
     {
-        $category = $params['category'];
-        $post = $params['post'];
+        $post = model()->posts->categories->where(['category.slug' => $params['category'], 'post.slug' => $params['post']])->fetch();
 
-        $model = Model::getInstance();
-        $post = $model->posts->categories->where(['category.slug' => $category, 'post.slug' => $post])->fetch();
+        if ($post) {        
+            $this->assign('title', $post['post.title']);
+            $this->assign('menu_item', 'blog');
 
-        if ($post) {
-            $this->title = $post['post.title'];
-        
-            $this->vars['title'] = $post['post.title'];
-            $this->vars['content'] = $post['post.content'];
-            $this->vars['delete'] = '/blog/delete/'.$post['post.slug'].'/';
+            $this->assign('content', $post['post.content']);
+            $this->assign('thumb', $post['post.thumb']);
+            $this->assign('edit', '/blog/edit/'.$post['post.slug'].'/');
+            $this->assign('delete', '/blog/delete/'.$post['post.slug'].'/');
         
         } else {
             $this->isset = false;

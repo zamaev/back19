@@ -9,5 +9,5 @@ return [
     '/blog/(?<category>[0-9a-zA-Zа-яА-Я_-]+)/' => 'BlogCategory',
     '/blog/(?<category>[0-9a-zA-Zа-яА-Я_-]+)/(?<post>[0-9a-zA-Zа-яА-Я_-]+)/' => 'BlogPost',
 
-    '/api/rand_img/' => 'api/get_rand_img',
+    '/api/(?<path>.+)/' => 'Api',
 ];

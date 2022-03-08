@@ -4,10 +4,7 @@ class BlogPostDelete
 {
     public function __construct($params)
     {
-        $slug = $params['slug'];
-        
-        $model = Model::getInstance();
-        $post = $model->post(['slug' => $slug]);
+        $post = model()->post(['slug' => $params['slug']]);
         if ($post) {
             $post->delete();
         }

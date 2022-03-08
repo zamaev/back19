@@ -1,15 +1,11 @@
 <?php
 
-class ErrorPage extends Page
+class ErrorPage extends View
 {
-    public function __construct()
+    public function run()
     {
-        $this->title = '404';
-                
-        $this->vars['title'] = '404';
-        $this->vars['content'] = 'Page not found';
-        
         header("HTTP/1.1 404 Not Found");
+        $this->assign('title', '404');
+        $this->assign('content', 'Page not found');
     }
-
 }
