@@ -1,6 +1,8 @@
 <?php
 
-class ErrorPage extends View
+use \Core\Controller;
+
+class ErrorPage extends Controller
 {
     public function run()
     {

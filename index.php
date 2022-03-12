@@ -1,20 +1,18 @@
 <?php
+
+spl_autoload_register();
+
+const ROOT_DIR = __DIR__;
+
 require_once 'core/tools/errors.php';
 require_once 'core/tools/debug.php';
-require_once 'core/tools/cache.php';
 
-require_once 'core/patterns/singleton.php';
+function model($table = null) { 
+	if ($table) {
+		return Core\Model\Model::getInstance()->{$table};
+	} else {
+		return Core\Model\Model::getInstance(); 
+	}
+}
 
-require_once 'core/model/model.php';
-require_once 'core/model/query.php';
-require_once 'core/model/entity.php';
-
-require_once 'core/libs/smarty/Smarty.class.php';
-require_once 'core/routing/View.php';
-require_once 'core/routing/Router.php';
-
-// require_once 'core/auth/auth.php';
-
-const APP_DIR = __DIR__;
-
-Router::route();
+new Core\Route;

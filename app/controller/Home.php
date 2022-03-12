@@ -1,6 +1,8 @@
 <?php
 
-class Home extends View
+use \Core\Controller;
+
+class Home extends Controller
 {
     public function run()
     {        

@@ -1,6 +1,10 @@
 <?php
+namespace Core\Model;
 
-class Model extends Singleton
+use \mysqli;
+use \Core\Tools\Cache;
+
+class Model extends \Core\Patterns\Singleton
 {
     private $db;
 
@@ -9,7 +13,7 @@ class Model extends Singleton
 
     protected function __construct()
     {
-		list('host' => $host, 'user' => $user, 'pass' => $pass, 'name' => $name) = require(__DIR__.'/../../config/db.php');
+		list('host' => $host, 'user' => $user, 'pass' => $pass, 'name' => $name) = require(ROOT_DIR.'/config/db.php');
         mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         try {
             $this->db = new mysqli($host, $user, $pass, $name) or die('not connect to db');
@@ -115,12 +119,4 @@ class Model extends Singleton
     {
         return new Query(null, $query);
     }
-}
-
-function model($table = null) { 
-	if ($table) {
-		return Model::getInstance()->{$table};
-	} else {
-		return Model::getInstance(); 
-	}
 }

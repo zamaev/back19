@@ -1,6 +1,6 @@
 <?php
 
-$settings = require('config/settings.php');
+$settings = require(ROOT_DIR.'/config/settings.php');
 
 if ($settings['debug'] || $_GET['debug'] == 1) {
     error_reporting(E_ALL);

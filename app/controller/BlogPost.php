@@ -1,6 +1,8 @@
 <?php
 
-class BlogPost extends View
+use \Core\Controller;
+
+class BlogPost extends Controller
 {
     public function run($params)
     {

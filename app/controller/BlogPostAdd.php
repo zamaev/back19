@@ -1,6 +1,8 @@
 <?php
 
-class BlogPostAdd extends View
+use \Core\Controller;
+
+class BlogPostAdd extends Controller
 {
     public function run()
     {

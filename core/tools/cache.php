@@ -11,12 +11,13 @@
  *   чтобы можно было сделать полную очистку кэша во всех папках
  */
 
+namespace Core\Tools;
 
 class Cache
 {
     public static function set($name, $data)
     {
-        $debug = (require('config/settings.php'))['debug'];
+        $debug = (require(ROOT_DIR.'/config/settings.php'))['debug'];
         if ($debug) {
             self::clear('all');
             return null;
@@ -28,7 +29,7 @@ class Cache
 
     public static function get($name)
     {
-        $debug = (require('config/settings.php'))['debug'];
+        $debug = (require(ROOT_DIR.'/config/settings.php'))['debug'];
         if ($debug) {
             self::clear('all');
             return null;
