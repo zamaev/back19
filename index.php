@@ -1,6 +1,7 @@
 <?php
 
 spl_autoload_register();
+session_start();
 
 const ROOT_DIR = __DIR__;
 
@@ -13,6 +14,11 @@ function model($table = null) {
 	} else {
 		return Core\Model\Model::getInstance(); 
 	}
+}
+
+// каждый раз обращаться к базе не круто, нужно переносить в сессию нужную инфу
+function user() {
+	return Core\Auth\Auth::getUser();
 }
 
 new Core\Route;

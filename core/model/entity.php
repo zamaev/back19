@@ -115,7 +115,7 @@ class Entity
             $query = "INSERT INTO `{$this->table}` ({$columns}) VALUES ({$values});";
             model()->db->query($query);
 
-            // возможно это плохая реализация, потому перед получением id может запусаться несколько строк в многопоточном режиме
+            // возможно это плохая реализация, потому что перед получением id может записаться несколько строк в многопоточном режиме (возможно)
             $this->entity_id = model()->query('SELECT LAST_INSERT_ID() as id;')->fetch()['id'];
             $this->data[$this->entity_name] = $this->entity_id;
 

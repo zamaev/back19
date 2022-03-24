@@ -1,6 +1,6 @@
 <?php
 
-use \Core\Controller;
+use Core\Controller;
 
 class Home extends Controller
 {

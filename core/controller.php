@@ -20,6 +20,7 @@ class Controller extends \Smarty
         
         if ($this->isset) {
             $this->assign('template', static::class);
+            $this->assign('user', Auth\Auth::getUser());
             $this->display('Layout.html');
         }
     }
